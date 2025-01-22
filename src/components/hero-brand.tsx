@@ -5,7 +5,7 @@ export default function HeroBrand() {
     <Link to="/">
       <div className="p-2 flex gap-4 items-center">
         <img
-          src="logo-small.svg"
+          src="/logo-small.svg"
           alt="Logo"
           className="object-contain h-8 w-8"
         />

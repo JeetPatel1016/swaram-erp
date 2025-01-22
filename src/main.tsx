@@ -6,7 +6,11 @@ import Login from "@/routes/Login";
 import AuthGuard from "@/auth/AuthGuard";
 import Root from "@/routes/Root";
 import HomePage from "@/pages/HomePage";
-import NotFoundPage from "./pages/ErrorPage";
+import NotFoundPage from "@/pages/ErrorPage";
+import CoursePage from "@/pages/courses/Courses";
+import EditCourse from "@/pages/courses/EditCourse";
+import AddCourse from "./pages/courses/AddCourse";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -22,7 +26,20 @@ const router = createBrowserRouter([
           {
             path: "/",
             element: <App />,
-            children: [{ path: "/", element: <HomePage /> }],
+            children: [
+              { path: "/", element: <HomePage /> },
+              {
+                path: "/courses",
+                children: [
+                  {
+                    index: true,
+                    element: <CoursePage />,
+                  },
+                  { path: "add", element: <AddCourse /> },
+                  { path: "edit/:id", element: <EditCourse /> },
+                ],
+              },
+            ],
           },
         ],
       },
