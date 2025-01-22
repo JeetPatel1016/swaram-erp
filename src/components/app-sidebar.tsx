@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import HeroBrand from "./hero-brand";
+import { useLocation } from "react-router-dom";
 
 // This is sample data.
 type NavItem = { title: string; url: string; isActive?: boolean };
@@ -31,7 +32,7 @@ const data: { versions: string[]; navMain: NavGroup[] } = {
         },
         {
           title: "Courses",
-          url: "#",
+          url: "/courses",
         },
         {
           title: "Fees",
@@ -58,10 +59,6 @@ const data: { versions: string[]; navMain: NavGroup[] } = {
       url: "#",
       items: [
         {
-          title: "Courses",
-          url: "#",
-        },
-        {
           title: "Batches",
           url: "#",
         },
@@ -75,6 +72,8 @@ const data: { versions: string[]; navMain: NavGroup[] } = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const location = useLocation();
+  const modulePath = location.pathname.split("/")[1];
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -93,7 +92,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenu>
                   {item.items.map((item) => (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild isActive={item.isActive}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={`/${modulePath}` === item.url}
+                      >
                         <a href={item.url}>{item.title}</a>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
