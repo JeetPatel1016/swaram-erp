@@ -23,9 +23,10 @@ import {
 } from "@/components/ui/sidebar";
 import { supabase } from "@/lib/supabase";
 import { Theme, useTheme } from "@/providers/theme-provider";
+import { User2Icon } from "lucide-react";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { session } = useSession();
+  const { user } = useSession();
   const { theme, setTheme } = useTheme();
 
   const logout = async () => {
@@ -44,18 +45,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <DropdownMenuTrigger className="cursor-pointer" asChild>
               <Avatar className="ml-auto">
                 <AvatarImage
-                  src="https://picsum.photos/100"
+                  src={user?.avatar_url ? user.avatar_url : ""}
                   alt="Profile Pic"
                 />
                 <AvatarFallback>
-                  {session?.user.user_metadata.display_name.toString()[0]}
+                  <User2Icon className="text-gray-500 dark:text-neutral-500" />
                 </AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48 mr-4">
-              <DropdownMenuLabel>
-                {session?.user.user_metadata.display_name}
-              </DropdownMenuLabel>
+              <DropdownMenuLabel>{user?.name || "User"}</DropdownMenuLabel>
               <DropdownMenuSeparator />
 
               <DropdownMenuSub>
