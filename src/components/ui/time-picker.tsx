@@ -1,124 +1,103 @@
-import { forwardRef, ComponentProps, useEffect, useRef, useState } from "react";
-import { Clock } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ClockIcon } from "lucide-react";
 
-// Importing shadcn Components
 import { cn } from "@/lib/utils";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverTrigger } from "@/components/ui/popover";
-import { PopoverContent } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-interface TimePickerProps extends ComponentProps<"input"> {
+interface TimePickerProps {
   value?: string;
-  onValueChange: (value: string) => void;
+  onChange?: (newTime: string) => void;
+  className?: string;
 }
 
-const TimePicker = forwardRef<HTMLInputElement, TimePickerProps>(
-  ({ value, onValueChange, className, ...inputProps }, ref) => {
-    const [hour, setHour] = useState<string>();
-    const [minute, setMinute] = useState<string>();
-    const [isOpen, setIsOpen] = useState<boolean>(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
+export function TimePicker({ value, onChange, className }: TimePickerProps) {
+  const [time, setTime] = useState<string>(value || "");
+  const [isOpen, setIsOpen] = useState(false);
 
-    const hours = Array.from({ length: 24 }, (_, i) =>
-      i.toString().padStart(2, "0")
-    );
-    const minutes = Array.from({ length: 60 }, (_, i) =>
-      i.toString().padStart(2, "0")
-    );
+  const hours = Array.from({ length: 24 }, (_, i) => i);
+  const minutes = Array.from({ length: 12 }, (_, i) => i * 5);
 
-    const handleSelect = (type: "hour" | "minute", value: string) => {
-      if (type === "hour") {
-        setHour(value);
-        setMinute((prev) => prev ?? "00");
-      } else {
-        setHour((prev) => prev ?? "23");
-        setMinute(value);
-      }
-    };
-    useEffect(() => {
-      if (value) {
-        const [h, m] = value.split(":");
-        setHour(h);
-        setMinute(m);
-      }
-    }, [value]);
+  useEffect(() => {
+    if (value !== undefined) setTime(value);
+  }, [value]);
+  const handleTimeChange = (type: "hour" | "minute", value: number) => {
+    let [hr, m] = time.split(":");
+    if (type === "hour") {
+      hr = value.toString().padStart(2, "0");
+      if (!m) m = "00";
+    }
+    if (type === "minute") {
+      m = value.toString().padStart(2, "0");
+      if (!hr) hr = "17";
+    }
+    if (onChange) onChange(`${hr}:${m}`);
+    setTime(`${hr}:${m}`);
+  };
 
-    useEffect(() => {
-      if (onValueChange) {
-        if (hour && minute) onValueChange(`${hour}:${minute}`);
-        else onValueChange(`00:00`);
-      }
-    }, [hour, minute, onValueChange]);
-
-    return (
-      <div className={cn("relative", className)} ref={dropdownRef}>
-        {/* Hidden Input Field */}
-        <input
-          ref={ref}
-          type="hidden"
-          value={`${hour}:${minute}`}
-          {...inputProps}
-        />
-
-        <Popover open={isOpen} onOpenChange={setIsOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant={"outline"}
-              onClick={() => setIsOpen((prev) => !prev)}
-              className={cn(
-                "min-w-32 text-left justify-between gap-4 font-normal",
-                !hour && !minute && "text-muted-foreground",
-                isOpen && "outline-none ring-1 ring-ring",
-                className
-              )}
-            >
-              <p className="leading-10">
-                {hour || "HH"}:{minute || "MM"}
-              </p>
-              <Clock size={16} className={``} />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 mt-2 border border-input rounded-md">
-            <div className="flex flex-col sm:flex-row sm:h-[250px] divide-y sm:divide-y-0 sm:divide-x">
-              <ScrollArea className="w-64 sm:w-auto">
-                <div className="flex flex-col p-2">
-                  {hours.reverse().map((h, index) => (
-                    <Button
-                      key={index}
-                      size="icon"
-                      variant={hour === h ? "default" : "ghost"}
-                      className={"sm:w-full shrink-0 aspect-square font-normal"}
-                      onClick={() => handleSelect("hour", h)}
-                    >
-                      {h}
-                    </Button>
-                  ))}
-                </div>
-              </ScrollArea>
-              <ScrollArea className="w-64 sm:w-auto">
-                <div className="flex flex-col p-2">
-                  {minutes.map((min, index) => (
-                    <Button
-                      key={index}
-                      size="icon"
-                      variant={minute === min ? "default" : "ghost"}
-                      className={"sm:w-full shrink-0 aspect-square font-normal"}
-                      onClick={() => handleSelect("minute", min)}
-                    >
-                      {min}
-                    </Button>
-                  ))}
-                </div>
-              </ScrollArea>
+  return (
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className={cn(
+            "justify-start text-left font-normal",
+            className,
+            !time && "text-muted-foreground"
+          )}
+        >
+          <ClockIcon />
+          <span>{time ? time : "HH:MM"}</span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0">
+        <div className="flex sm:h-[300px] divide-x">
+          {/* Hours Selection */}
+          <ScrollArea>
+            <div className="flex flex-col p-2">
+              {[...hours].reverse().map((hour) => (
+                <Button
+                  key={hour}
+                  size="icon"
+                  variant={
+                    time.split(":")[0] === hour.toString() ? "default" : "ghost"
+                  }
+                  className="font-normal"
+                  onClick={() => handleTimeChange("hour", hour)}
+                >
+                  {hour.toString().padStart(2, "0")}
+                </Button>
+              ))}
             </div>
-          </PopoverContent>
-        </Popover>
-      </div>
-    );
-  }
-);
+          </ScrollArea>
 
-TimePicker.displayName = "TimePicker";
-
-export default TimePicker;
+          {/* Minutes Selection */}
+          <ScrollArea>
+            <div className="flex flex-col p-2">
+              {minutes.map((minute) => (
+                <Button
+                  key={minute}
+                  size="icon"
+                  variant={
+                    time.split(":")[1] === minute.toString().padStart(2, "0")
+                      ? "default"
+                      : "ghost"
+                  }
+                  className="font-normal"
+                  onClick={() => handleTimeChange("minute", minute)}
+                >
+                  {minute.toString().padStart(2, "0")}
+                </Button>
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
