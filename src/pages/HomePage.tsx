@@ -1,4 +1,5 @@
 import { useSession } from "@/auth/SessionContext";
+import { TimePicker } from "@/components/ui/time-picker";
 import { FiUser, FiBook, FiDollarSign, FiChevronRight } from "react-icons/fi";
 import { Link } from "react-router-dom";
 function generateGreeting(name: string) {
@@ -44,6 +45,7 @@ const quickLinks: QuickLink[] = [
 export default function HomePage() {
   const { session } = useSession();
   const name = session?.user.user_metadata.display_name;
+
   return (
     <>
       <div className="select-none w-full bg-gradient-to-br p-6 from-primary to-primary/65 rounded-xl flex flex-col text-white items-center">
@@ -55,7 +57,7 @@ export default function HomePage() {
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4 w-full mt-8 mb-2">
           {quickLinks.map((link) => (
-            <Link to={link.url} key={link.title}>
+            <Link className="hover:!text-white" to={link.url} key={link.title}>
               <div className="transition bg-white/20 hover:bg-white/25 rounded p-2 flex items-center gap-4 group">
                 <div className="w-10 h-10 rounded bg-white/30 p-2">
                   {link.Icon("text-white/70 w-full h-full")}
@@ -67,6 +69,7 @@ export default function HomePage() {
           ))}
         </div>
       </div>
+      <TimePicker onChange={(value) => console.log(value)} />
     </>
   );
 }

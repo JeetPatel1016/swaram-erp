@@ -60,7 +60,7 @@ const data: { versions: string[]; navMain: NavGroup[] } = {
       items: [
         {
           title: "Batches",
-          url: "#",
+          url: "/batches",
         },
         {
           title: "Time Table",
