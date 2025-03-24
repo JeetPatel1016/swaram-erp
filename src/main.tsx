@@ -5,48 +5,71 @@ import App from "@/routes/App";
 import Login from "@/routes/Login";
 import AuthGuard from "@/auth/AuthGuard";
 import Root from "@/routes/Root";
+
+// Importing Pages
 import HomePage from "@/pages/HomePage";
 import NotFoundPage from "@/pages/ErrorPage";
 import CoursePage from "@/pages/courses/Courses";
 import EditCourse from "@/pages/courses/EditCourse";
-import AddCourse from "./pages/courses/AddCourse";
+import AddCourse from "@/pages/courses/AddCourse";
+import BatchPage from "@/pages/batches/Batches";
+import BatchDetails from "@/pages/batches/BatchDetails";
+import AddBatch from "@/pages/batches/AddBatch";
+import EditBatch from "@/pages/batches/EditBatch";
+import BatchLayout from "@/layout/BatchLayout";
+import EditTimings from "@/pages/batches/EditTimings";
+import EditBatchCourses from "@/pages/batches/EditBatchCourses";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Root />,
-    children: [
-      // Public Routes
-      { path: "/login", element: <Login /> },
-      {
-        // Private Routes
-        path: "/",
-        element: <AuthGuard />,
-        children: [
-          {
-            path: "/",
-            element: <App />,
-            children: [
-              { path: "/", element: <HomePage /> },
-              {
-                path: "/courses",
-                children: [
-                  {
-                    index: true,
-                    element: <CoursePage />,
-                  },
-                  { path: "add", element: <AddCourse /> },
-                  { path: "edit/:id", element: <EditCourse /> },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-    errorElement: <NotFoundPage />,
-  },
-]);
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <Root />,
+      children: [
+        // Public Routes
+        { path: "login", element: <Login /> },
+        {
+          // Private Routes
+          path: "/",
+          element: <AuthGuard />,
+          children: [
+            {
+              path: "/",
+              element: <App />,
+              children: [
+                { path: "/", element: <HomePage /> },
+                {
+                  path: "courses",
+                  children: [
+                    {
+                      index: true,
+                      element: <CoursePage />,
+                    },
+                    { path: "add", element: <AddCourse /> },
+                    { path: "edit/:id", element: <EditCourse /> },
+                  ],
+                },
+                {
+                  path: "batches",
+                  element: <BatchLayout />,
+                  children: [
+                    { index: true, element: <BatchPage /> },
+                    { path: "add", element: <AddBatch /> },
+                    { path: "edit/:id", element: <EditBatch /> },
+                    { path: "edit/:id/timings", element: <EditTimings /> },
+                    { path: "edit/:id/courses", element: <EditBatchCourses /> },
+                    { path: ":id", element: <BatchDetails /> },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      errorElement: <NotFoundPage />,
+    },
+  ],
+);
 
 createRoot(document.getElementById("root")!).render(
   <RouterProvider router={router} />

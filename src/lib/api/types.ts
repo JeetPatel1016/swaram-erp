@@ -34,6 +34,107 @@ export type Database = {
   }
   public: {
     Tables: {
+      batch_schedules: {
+        Row: {
+          batch_id: string
+          day_of_week: Database["public"]["Enums"]["days"]
+          end_time: string
+          id: string
+          start_time: string
+        }
+        Insert: {
+          batch_id: string
+          day_of_week: Database["public"]["Enums"]["days"]
+          end_time: string
+          id?: string
+          start_time: string
+        }
+        Update: {
+          batch_id?: string
+          day_of_week?: Database["public"]["Enums"]["days"]
+          end_time?: string
+          id?: string
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batch_schedules_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      batch_year_courses: {
+        Row: {
+          batch_id: string | null
+          course_id: string | null
+          created_at: string
+          id: string
+          year_number: number
+        }
+        Insert: {
+          batch_id?: string | null
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          year_number: number
+        }
+        Update: {
+          batch_id?: string | null
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          year_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batch_year_courses_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batch_year_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      batches: {
+        Row: {
+          academic_year: number | null
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          name: string
+          start_date: string | null
+        }
+        Insert: {
+          academic_year?: number | null
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          name: string
+          start_date?: string | null
+        }
+        Update: {
+          academic_year?: number | null
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          name?: string
+          start_date?: string | null
+        }
+        Relationships: []
+      }
       courses: {
         Row: {
           created_at: string
@@ -122,7 +223,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      days:
+        | "Monday"
+        | "Tuesday"
+        | "Wednesday"
+        | "Thursday"
+        | "Friday"
+        | "Saturday"
+        | "Sunday"
+        | ""
     }
     CompositeTypes: {
       [_ in never]: never
