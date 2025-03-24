@@ -64,7 +64,7 @@ export default function AddBatch() {
     end_time: "",
   });
   const [schedule, setSchedule] = useState<TimingInsert[]>([]);
-  const days: (DaysEnum | "")[] = [
+  const days: DaysEnum[] = [
     "Monday",
     "Tuesday",
     "Wednesday",
@@ -401,7 +401,11 @@ export default function AddBatch() {
                           </Select>
                           {/* Year Selection */}
                           <Select
-                            value={String(courseYearSelection.year_number)}
+                            value={
+                              courseYearSelection.year_number === 0
+                                ? ""
+                                : courseYearSelection.year_number.toString()
+                            }
                             onValueChange={(value) =>
                               handleYearSelection(value)
                             }

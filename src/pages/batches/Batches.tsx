@@ -116,6 +116,20 @@ export default function Batches() {
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
+                  navigate(`/batches/edit/${batch.id}/timings`);
+                }}
+              >
+                Edit Timings
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  navigate(`/batches/edit/${batch.id}/courses`);
+                }}
+              >
+                Edit Courses
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
                   removeBatch(row.original.id);
                 }}
               >

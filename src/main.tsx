@@ -16,7 +16,9 @@ import BatchPage from "@/pages/batches/Batches";
 import BatchDetails from "@/pages/batches/BatchDetails";
 import AddBatch from "@/pages/batches/AddBatch";
 import EditBatch from "@/pages/batches/EditBatch";
-import BatchLayout from "./layout/BatchLayout";
+import BatchLayout from "@/layout/BatchLayout";
+import EditTimings from "@/pages/batches/EditTimings";
+import EditBatchCourses from "@/pages/batches/EditBatchCourses";
 
 const router = createBrowserRouter(
   [
@@ -54,6 +56,8 @@ const router = createBrowserRouter(
                     { index: true, element: <BatchPage /> },
                     { path: "add", element: <AddBatch /> },
                     { path: "edit/:id", element: <EditBatch /> },
+                    { path: "edit/:id/timings", element: <EditTimings /> },
+                    { path: "edit/:id/courses", element: <EditBatchCourses /> },
                     { path: ":id", element: <BatchDetails /> },
                   ],
                 },
