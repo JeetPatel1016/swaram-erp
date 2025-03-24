@@ -46,7 +46,7 @@ export function TimePicker({ value, onChange, className }: TimePickerProps) {
         <Button
           variant="outline"
           className={cn(
-            "justify-start text-left font-normal",
+            "bg-transparent justify-start text-left font-normal",
             className,
             !time && "text-muted-foreground"
           )}

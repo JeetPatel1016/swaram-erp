@@ -1,5 +1,4 @@
 import { useSession } from "@/auth/SessionContext";
-import { TimePicker } from "@/components/ui/time-picker";
 import { FiUser, FiBook, FiDollarSign, FiChevronRight } from "react-icons/fi";
 import { Link } from "react-router-dom";
 function generateGreeting(name: string) {
@@ -55,7 +54,7 @@ export default function HomePage() {
         <p className="mb-4 text-base text-center text-white/85 w-[80%]">
           Here are some quick links to get you started.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4 w-full mt-8 mb-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4 w-full mt-8 mb-2">
           {quickLinks.map((link) => (
             <Link className="hover:!text-white" to={link.url} key={link.title}>
               <div className="transition bg-white/20 hover:bg-white/25 rounded p-2 flex items-center gap-4 group">
@@ -69,7 +68,6 @@ export default function HomePage() {
           ))}
         </div>
       </div>
-      <TimePicker onChange={(value) => console.log(value)} />
     </>
   );
 }

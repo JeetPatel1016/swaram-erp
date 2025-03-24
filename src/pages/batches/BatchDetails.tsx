@@ -160,7 +160,7 @@ export default function BatchDetails() {
                           <TableRow>
                             <TableCell colSpan={3}>
                               <div className="h-32 w-full flex items-center justify-center">
-                                No schedule records found.
+                                No course records found.
                               </div>
                             </TableCell>
                           </TableRow>
