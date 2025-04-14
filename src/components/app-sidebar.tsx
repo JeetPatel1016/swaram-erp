@@ -82,9 +82,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         {/* We create a SidebarGroup for each parent. */}
         {data.navMain.map((item) => (
-          <>
+          <React.Fragment key={item.title}>
             <Separator />
-            <SidebarGroup key={item.title}>
+            <SidebarGroup>
               <SidebarGroupLabel className="tracking-wide font-semibold">
                 {item.title.toUpperCase()}
               </SidebarGroupLabel>
@@ -103,7 +103,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
-          </>
+          </React.Fragment>
         ))}
       </SidebarContent>
       <SidebarRail />
