@@ -19,6 +19,7 @@ import EditBatch from "@/pages/batches/EditBatch";
 import BatchLayout from "@/layout/BatchLayout";
 import EditTimings from "@/pages/batches/EditTimings";
 import EditBatchCourses from "@/pages/batches/EditBatchCourses";
+import Students from "@/pages/students/Students";
 
 const router = createBrowserRouter([
   {
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
                   { path: "edit/:id/courses", element: <EditBatchCourses /> },
                   { path: ":id", element: <BatchDetails /> },
                 ],
+              },
+              {
+                path: "students",
+                children: [{ index: true, element: <Students /> }],
               },
             ],
           },
