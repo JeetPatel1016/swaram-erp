@@ -33,7 +33,6 @@ export default function DatePicker({
   const [date, setDate] = React.useState<Date>(
     value ? new Date(value) : new Date()
   );
-
   const months = [
     "January",
     "February",
@@ -73,6 +72,13 @@ export default function DatePicker({
     }
   };
 
+  React.useEffect(() => {
+    if (endYear && date.getFullYear() > endYear) {
+      const newDate = new Date(date);
+      newDate.setFullYear(endYear);
+      setDate(newDate);
+    }
+  }, [date, endYear, value]);
   return (
     <Popover>
       <PopoverTrigger asChild>

@@ -8,7 +8,15 @@ import {
   Image,
   Font,
 } from "@react-pdf/renderer";
+
+import parsePhoneNumber from "libphonenumber-js";
 import condensedSource from "/RobotoCondensed-VariableFont.ttf";
+import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { studentFns, studentKeys } from "@/query/students";
+import Loader from "@/components/Loader";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase";
 
 Font.register({ family: "RobotoCondensed", src: condensedSource });
 Font.register({
@@ -29,7 +37,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     alignItems: "center",
     fontFamily: "Roboto",
-    fontWeight: 300,
+    fontWeight: 400,
   },
   banner: {
     backgroundColor: "#52525c",
@@ -100,262 +108,344 @@ const rules = [
 ];
 
 export default function AdmissionForm() {
+  const { id } = useParams();
+  const { data, error, isLoading } = useQuery({
+    queryKey: studentKeys.getStudentById(id!),
+    queryFn: () => studentFns.getStudentByIdFn(id!),
+  });
+
+  const navigate = useNavigate();
+
   return (
     <>
-      <PDFViewer className="h-screen w-full">
-        <Document>
-          {/* First Page */}
-          <Page size="A4" style={styles.page}>
-            {/* Logo */}
-            <Image
-              source={"/swaramlogo.jpg"}
-              style={{ objectFit: "cover", width: "45%" }}
-            />
-            {/* Details Banner */}
-            <View style={styles.banner}>
-              <Text>
-                A-408, Raj Corner, Opp. Vasupujya Residency, Pal, Surat - 395
-                009
-              </Text>
-            </View>
-            <View style={[styles.banner, { gap: "24px", marginTop: "-1px" }]}>
-              <Text>Email: swaram.music.academy@gmail.com</Text>
-              <Text>Mobile: +91 75730 34123, +91 98980 94123</Text>
-            </View>
-            {/* Body */}
-            <View style={[styles.section, { margin: 16 }]}>
-              <Text
-                style={{
-                  fontSize: "18pt",
-                  fontWeight: "600",
-                  textAlign: "center",
-                }}
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <>
+          {data && (
+            <PDFViewer className="h-screen w-full">
+              <Document
+                title={`${data.first_name} ${data.last_name} - Admission Form`}
+                subject={`Admission Form`}
               >
-                Admission Form
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.section,
-                {
-                  width: "100%",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                },
-              ]}
-            >
-              <Text>
-                Date:{" "}
-                {new Date().toLocaleString("en-gb", {
-                  day: "numeric",
-                  month: "numeric",
-                  year: "numeric",
-                })}
-              </Text>
-              <Text>GR. NO.: {"532"}</Text>
-            </View>
-            {/* Personal Details */}
-            <View style={[styles.section, { marginTop: 16 }]}>
-              <View style={styles.container}>
-                <Text style={styles.containerTitle}>Personal Details</Text>
-                <View
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    gap: 32,
-                    alignItems: "center",
-                  }}
-                >
-                  <View
-                    style={{
-                      display: "flex",
-                      gap: "4px",
-                      fontWeight: "600",
-                    }}
-                  >
-                    <Text>Name</Text>
-                    <Text>Age</Text>
-                    <Text>Gender</Text>
-                    <Text>Address</Text>
-                    <Text>City</Text>
-                    <Text>State</Text>
-                    <Text>Pincode</Text>
+                {/* First Page */}
+                <Page size="A4" style={styles.page}>
+                  {/* Logo */}
+                  <Image
+                    source={"/swaramlogo.jpg"}
+                    style={{ objectFit: "cover", width: "45%" }}
+                  />
+                  {/* Details Banner */}
+                  <View style={styles.banner}>
+                    <Text>
+                      A-408, Raj Corner, Opp. Vasupujya Residency, Pal, Surat -
+                      395 009
+                    </Text>
                   </View>
                   <View
-                    style={{
-                      display: "flex",
-                      gap: "4px",
-                    }}
+                    style={[styles.banner, { gap: "24px", marginTop: "-1px" }]}
                   >
-                    <Text>{"Rahul Sharma"}</Text>
-                    <Text>{"24"}</Text>
-                    <Text>{"Male"}</Text>
-                    <Text>{"45/A, MG Road, Sector 21"}</Text>
-                    <Text>{"Pune"}</Text>
-                    <Text>{"Maharashtra"}</Text>
-                    <Text>{"411001"}</Text>
+                    <Text>Email: swaram.music.academy@gmail.com</Text>
+                    <Text>Mobile: +91 75730 34123, +91 98980 94123</Text>
                   </View>
-                  <View
-                    style={{
-                      width: "100px",
-                      height: "114px",
-                      border: "1px solid black",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      marginLeft: "auto",
-                    }}
-                  >
-                    <Image
+                  {/* Body */}
+                  <View style={[styles.section, { margin: 16 }]}>
+                    <Text
                       style={{
+                        fontSize: "18pt",
+                        fontWeight: "600",
+                        textAlign: "center",
+                      }}
+                    >
+                      Admission Form
+                    </Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.section,
+                      {
                         width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                      source={{
-                        uri: "https://bgqzfrelvcoeygjokpvw.supabase.co/storage/v1/object/public/avatars//admin.png",
-                        method: "GET",
-                        headers: { "Cache-control": "no-cache" },
-                      }}
-                    />
-                  </View>
-                </View>
-              </View>
-            </View>
-            {/* Contact Details */}
-            <View style={[styles.section, { marginTop: 16 }]}>
-              <View style={styles.container}>
-                <Text style={styles.containerTitle}>Contact Details</Text>
-                <View style={{ display: "flex", gap: "8px" }}>
-                  {/* Mapping contact Detail Entry */}
-                  <>
-                    <View
-                      style={{
                         flexDirection: "row",
-                        marginBottom: "4px",
-                        // marginTop: 20 -> For all elements except 0
-                      }}
-                    >
-                      <Text>
-                        <Text style={{ fontWeight: "600" }}>Name:</Text>{" "}
-                        {"Rakesh Sharma"}
+                        justifyContent: "space-between",
+                      },
+                    ]}
+                  >
+                    <Text>
+                      Date:{" "}
+                      {new Date(data.admission_date).toLocaleString("en-gb", {
+                        day: "numeric",
+                        month: "numeric",
+                        year: "numeric",
+                      })}
+                    </Text>
+                    <Text>GR. NO: {data.gr_no}</Text>
+                  </View>
+                  {/* Personal Details */}
+                  <View style={[styles.section, { marginTop: 16 }]}>
+                    <View style={styles.container}>
+                      <Text style={styles.containerTitle}>
+                        Personal Details
                       </Text>
-                      <Text style={{ marginLeft: "auto" }}>{"Parent"}</Text>
-                    </View>
-                    <View style={{ flexDirection: "row", gap: "20px" }}>
-                      <View style={{ gap: "5px", fontWeight: "500" }}>
-                        <Text>Mobile Number</Text>
-                        <Text>Whatsapp Number</Text>
-                        <Text>Email</Text>
+                      <View
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          gap: 32,
+                          alignItems: "center",
+                        }}
+                      >
+                        <View
+                          style={{
+                            display: "flex",
+                            gap: "4px",
+                            fontWeight: "600",
+                          }}
+                        >
+                          <Text>Name</Text>
+                          <Text>Age</Text>
+                          <Text>Gender</Text>
+                          <Text>Address</Text>
+                          <Text>City</Text>
+                          <Text>State</Text>
+                          <Text>Pincode</Text>
+                        </View>
+                        <View
+                          style={{
+                            display: "flex",
+                            gap: "4px",
+                          }}
+                        >
+                          <Text>{`${data.first_name} ${data.middle_name} ${data.last_name}`}</Text>
+                          <Text>
+                            {(() => {
+                              const dob = new Date(data.date_of_birth);
+                              const today = new Date();
+                              let age = today.getFullYear() - dob.getFullYear();
+                              const hasHadBirthday =
+                                today.getMonth() > dob.getMonth() ||
+                                (today.getMonth() === dob.getMonth() &&
+                                  today.getDate() >= dob.getDate());
+                              if (!hasHadBirthday) age--;
+                              return age;
+                            })()}
+                          </Text>
+                          <Text>{data.gender}</Text>
+                          <Text>{`${
+                            data.addresses!.unit
+                              ? data.addresses!.unit + ","
+                              : ""
+                          } ${data.addresses!.line_1}${
+                            data.addresses!.line_2
+                              ? ", " + data.addresses!.line_2
+                              : ""
+                          }`}</Text>
+                          <Text>{`${data.addresses?.city}`}</Text>
+                          <Text>{`${data.addresses?.state}`}</Text>
+                          <Text>{`${data.addresses?.zipcode}`}</Text>
+                        </View>
+                        <View
+                          style={{
+                            width: "100px",
+                            height: "114px",
+                            border: "1px solid black",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginLeft: "auto",
+                          }}
+                        >
+                          <Image
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                            source={{
+                              uri: supabase.storage
+                                .from("students")
+                                .getPublicUrl(data.avatar_url!).data.publicUrl,
+                              method: "GET",
+                              headers: { "Cache-control": "no-cache" },
+                            }}
+                          />
+                        </View>
                       </View>
-                      <View style={{ gap: "5px" }}>
-                        <Text>+91 98798 79879</Text>
-                        <Text>+91 98797 98798</Text>
-                        <Text>email12345@gmail.com</Text>
+                    </View>
+                  </View>
+                  {/* Contact Details */}
+                  <View style={[styles.section, { marginTop: 16 }]}>
+                    <View style={styles.container}>
+                      <Text style={styles.containerTitle}>Contact Details</Text>
+                      <View style={{ display: "flex", gap: "8px" }}>
+                        {/* Mapping contact Detail Entry */}
+                        <>
+                          {data.students_contacts.map((record, index) => (
+                            <>
+                              <View
+                                style={{
+                                  flexDirection: "row",
+                                  marginBottom: "4px",
+                                  marginTop: index !== 0 ? 20 : 0,
+                                }}
+                              >
+                                <Text>
+                                  <Text style={{ fontWeight: "600" }}>
+                                    Name:
+                                  </Text>{" "}
+                                  {record.contacts.contact_name}
+                                </Text>
+                                <Text style={{ marginLeft: "auto" }}>
+                                  {record.relationship}
+                                </Text>
+                              </View>
+                              <View
+                                style={{ flexDirection: "row", gap: "20px" }}
+                              >
+                                <View style={{ gap: "5px", fontWeight: "500" }}>
+                                  <Text>Mobile Number</Text>
+                                  <Text>Whatsapp Number</Text>
+                                  <Text>Email</Text>
+                                </View>
+                                <View style={{ gap: "5px" }}>
+                                  <Text>
+                                    {parsePhoneNumber(
+                                      record.contacts.phone
+                                    )?.formatInternational()}
+                                  </Text>
+                                  <Text>
+                                    {record.contacts.whatsapp_num &&
+                                      parsePhoneNumber(
+                                        record.contacts.whatsapp_num
+                                      )?.formatInternational()}
+                                  </Text>
+                                  <Text>{record.contacts.email}</Text>
+                                </View>
+                              </View>
+                            </>
+                          ))}
+                        </>
                       </View>
                     </View>
-                    <View
-                      style={{
+                  </View>
+                  {/* Enrollment Details */}
+                  <View style={[styles.section, { marginTop: 16 }]}>
+                    <View style={styles.container}>
+                      <Text style={styles.containerTitle}>
+                        Enrollment Details
+                      </Text>
+                      <View style={{ flexDirection: "row", gap: 44 }}>
+                        <View style={{ gap: 4 }}>
+                          <Text style={{ fontWeight: 500, marginBottom: 4 }}>
+                            Course
+                          </Text>
+                          {data.enrollments
+                            .filter((e) => e.status !== "Dropped")
+                            .map((record) => (
+                              <Text key={record.id}>
+                                {record.courses!.name}
+                              </Text>
+                            ))}
+                        </View>
+                        <View style={{ gap: 4 }}>
+                          <Text style={{ fontWeight: 500, marginBottom: 4 }}>
+                            Music Examination Year
+                          </Text>
+                          {data.enrollments
+                            .filter((e) => e.status !== "Dropped")
+                            .map((record) => (
+                              <Text key={record.id}>{record.current_year}</Text>
+                            ))}
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                </Page>
+                {/* Second Page */}
+                <Page size={"A4"} style={styles.page}>
+                  <View style={[styles.section, { marginVertical: 32 }]}>
+                    <View style={styles.container}>
+                      <Text style={styles.containerTitle}>
+                        Rules and Regulations
+                      </Text>
+                      <View style={styles.column}>
+                        {rules.map((rule, index) => (
+                          <View key={index} style={styles.row}>
+                            <View style={styles.bullet}>
+                              <Text>{"\u2022" + " "}</Text>
+                            </View>
+                            <View style={styles.bulletText}>
+                              <Text>
+                                <Text>{rule}</Text>
+                              </Text>
+                            </View>
+                          </View>
+                        ))}
+                      </View>
+                      <Text style={{ marginTop: 20 }}>
+                        <Text style={{ fontWeight: 500 }}>NOTICE:</Text> The
+                        Academy does not take responsibility for students who do
+                        not follow the above-mentioned rules.
+                      </Text>
+                    </View>
+                  </View>
+                  <View
+                    style={[
+                      styles.section,
+                      {
+                        marginTop: "auto",
+                        marginBottom: 32,
                         flexDirection: "row",
-                        marginBottom: "4px",
-                        marginTop: 20,
-                      }}
+                        justifyContent: "space-around",
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={{ borderTop: "1px solid #7f7f7f", padding: 8 }}
                     >
-                      <Text>
-                        <Text style={{ fontWeight: "600" }}>Name:</Text>{" "}
-                        {"Rakesh Sharma"}
-                      </Text>
-                      <Text style={{ marginLeft: "auto" }}>{"Parent"}</Text>
-                    </View>
-                    <View style={{ flexDirection: "row", gap: "20px" }}>
-                      <View style={{ gap: "2px", fontWeight: "500" }}>
-                        <Text>Mobile Number</Text>
-                        <Text>Whatsapp Number</Text>
-                        <Text>Email</Text>
-                      </View>
-                      <View style={{ gap: "2px" }}>
-                        <Text>+91 98798 79879</Text>
-                        <Text>+91 98797 98798</Text>
-                        <Text>email12345@gmail.com</Text>
-                      </View>
-                    </View>
-                  </>
-                </View>
-              </View>
-            </View>
-            {/* Enrollment Details */}
-            <View style={[styles.section, { marginTop: 16 }]}>
-              <View style={styles.container}>
-                <Text style={styles.containerTitle}>Enrollment Details</Text>
-                <View style={{ flexDirection: "row", gap: 44 }}>
-                  <View style={{ gap: 4 }}>
-                    <Text style={{ fontWeight: 500, marginBottom: 4 }}>
-                      Course
+                      Guardian Signature
                     </Text>
-                    <Text>Vocal Classical</Text>
-                    <Text>Tabla</Text>
-                  </View>
-                  <View style={{ gap: 4 }}>
-                    <Text style={{ fontWeight: 500, marginBottom: 4 }}>
-                      Music Examination Year
+                    <Text
+                      style={{ borderTop: "1px solid #7f7f7f", padding: 8 }}
+                    >
+                      Students Signature
                     </Text>
-                    <Text>5</Text>
-                    <Text>2</Text>
+                    <Text
+                      style={{ borderTop: "1px solid #7f7f7f", padding: 8 }}
+                    >
+                      Office Staff Signature
+                    </Text>
                   </View>
-                </View>
-              </View>
-            </View>
-          </Page>
-          {/* Second Page */}
-          <Page size={"A4"} style={styles.page}>
-            <View style={[styles.section, { marginVertical: 32 }]}>
-              <View style={styles.container}>
-                <Text style={styles.containerTitle}>Rules and Regulations</Text>
-                <View style={styles.column}>
-                  {rules.map((rule, index) => (
-                    <View key={index} style={styles.row}>
-                      <View style={styles.bullet}>
-                        <Text>{"\u2022" + " "}</Text>
-                      </View>
-                      <View style={styles.bulletText}>
-                        <Text>
-                          <Text>{rule}</Text>
-                        </Text>
-                      </View>
-                    </View>
-                  ))}
-                </View>
-                <Text style={{ marginTop: 20 }}>
-                  <Text style={{ fontWeight: 500 }}>NOTICE:</Text> The Academy
-                  does not take responsibility for students who do not follow
-                  the above-mentioned rules.
-                </Text>
-              </View>
-            </View>
-            <View
-              style={[
-                styles.section,
-                {
-                  marginTop: "auto",
-                  marginBottom: 32,
-                  flexDirection: "row",
-                  justifyContent: "space-around",
-                },
-              ]}
-            >
-              <Text style={{ borderTop: "1px solid #7f7f7f", padding: 8 }}>
-                Guardian Signature
-              </Text>
-              <Text style={{ borderTop: "1px solid #7f7f7f", padding: 8 }}>
-                Students Signature
-              </Text>
-              <Text style={{ borderTop: "1px solid #7f7f7f", padding: 8 }}>
-                Office Staff Signature
-              </Text>
-            </View>
-          </Page>
-        </Document>
-      </PDFViewer>
+                </Page>
+              </Document>
+            </PDFViewer>
+          )}
+          {error && (
+            <div className="w-screen h-screen flex flex-col items-center justify-center">
+              <p className="text-xl">
+                Something went wrong. Please try again later.
+              </p>
+              <div className="flex mt-4">
+                <Button
+                  className="text-lg"
+                  variant="link"
+                  onClick={() => navigate(-1)}
+                >
+                  {" "}
+                  Go back
+                </Button>
+                <Button
+                  className="text-lg"
+                  variant="link"
+                  onClick={() => navigate(0)}
+                >
+                  {" "}
+                  Refresh
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </>
   );
 }

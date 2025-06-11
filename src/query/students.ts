@@ -16,7 +16,9 @@ export const studentFns = {
   getStudentByIdFn: async (id: string) => {
     const { data, error } = await supabase
       .from("students")
-      .select("*, contacts(*), addresses(*)")
+      .select(
+        "*, students_contacts(contacts(*), *), addresses(*), student_fee_summary(*), enrollments(*, courses(*), batches(*))"
+      )
       .eq("id", id)
       .limit(1)
       .single();

@@ -116,11 +116,23 @@ export default function CoursePage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
+                onClick={() => navigate(`/courses/${course.id}`)}
+              >
+                View Course Details
+              </DropdownMenuItem>
+              <DropdownMenuItem
                 onClick={() => {
                   navigate(`/courses/edit/${course.id}`);
                 }}
               >
                 Edit Course Details
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  navigate(`/courses/edit/${course.id}/fee-structure`);
+                }}
+              >
+                Edit Course Fees
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {

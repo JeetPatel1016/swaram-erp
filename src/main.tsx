@@ -20,6 +20,16 @@ import BatchLayout from "@/layout/BatchLayout";
 import EditTimings from "@/pages/batches/EditTimings";
 import EditBatchCourses from "@/pages/batches/EditBatchCourses";
 import Students from "@/pages/students/Students";
+import StudentDetails from "@/pages/students/StudentDetails";
+import AddStudent from "@/pages/students/AddStudent";
+import CourseDetails from "@/pages/courses/CourseDetails";
+import EditCourseFees from "@/pages/courses/EditCourseFees";
+import EnrollStudent from "@/pages/students/EnrollStudent";
+import EditStudentDetails from "@/pages/students/EditStudentDetails";
+import AdmissionForm from "@/templates/AdmissionForm";
+import FeeReceipt from "@/templates/FeeReceipt";
+import FeeDetails from "@/pages/fees/FeeDetails";
+import TimeTable from "@/pages/TimeTable";
 
 const router = createBrowserRouter([
   {
@@ -45,8 +55,13 @@ const router = createBrowserRouter([
                     index: true,
                     element: <CoursePage />,
                   },
+                  { path: ":id", element: <CourseDetails /> },
                   { path: "add", element: <AddCourse /> },
                   { path: "edit/:id", element: <EditCourse /> },
+                  {
+                    path: "edit/:id/fee-structure",
+                    element: <EditCourseFees />,
+                  },
                 ],
               },
               {
@@ -63,7 +78,43 @@ const router = createBrowserRouter([
               },
               {
                 path: "students",
-                children: [{ index: true, element: <Students /> }],
+                children: [
+                  { index: true, element: <Students /> },
+                  { path: "add", element: <AddStudent /> },
+                  { path: "edit/:id", element: <EditStudentDetails /> },
+                  { path: ":id", element: <StudentDetails /> },
+                ],
+              },
+              {
+                path: "enrollment",
+                children: [{ path: ":id", element: <EnrollStudent /> }],
+              },
+              {
+                path: "fees",
+                children: [{ path: ":id", element: <FeeDetails /> }],
+              },
+              {
+                path: "time-table",
+                index: true,
+                element: <TimeTable />,
+              },
+            ],
+          },
+          {
+            path: "admission-form",
+            children: [
+              {
+                path: ":id",
+                element: <AdmissionForm />,
+              },
+            ],
+          },
+          {
+            path: "receipts",
+            children: [
+              {
+                path: ":id",
+                element: <FeeReceipt />,
               },
             ],
           },

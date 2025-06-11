@@ -22,11 +22,13 @@ import { Button } from "@/components/ui/button";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  className?: string
 }
 
 export default function DataTable<TData, TValue>({
   columns,
   data,
+  className
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -43,7 +45,7 @@ export default function DataTable<TData, TValue>({
   });
 
   return (
-    <div>
+    <div className={className}>
       <div className="rounded-md border">
         <Table>
           <TableHeader>

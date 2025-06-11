@@ -16,7 +16,7 @@ export const courseFns = {
   getCourseByIdFn: async (id: string) => {
     const { data, error } = await supabase
       .from("courses")
-      .select()
+      .select(`*, fee_structures(*)`)
       .eq("id", id)
       .single();
     if (error) {

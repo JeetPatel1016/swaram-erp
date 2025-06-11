@@ -4,7 +4,7 @@ import { studentFns, studentKeys } from "@/query/students";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import DataTable from "@/components/tables/data-table";
 import Loader from "@/components/Loader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -61,6 +61,13 @@ export default function Students() {
 
   // Method to remove student record
   const removeStudent = async (id: string) => {
+    const { data } = await supabase
+      .from("students")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    // Remove Student record
     const { error } = await supabase.from("students").delete().eq("id", id);
     if (error) {
       toast({
@@ -68,6 +75,22 @@ export default function Students() {
         description: "Error occurred while deleting student, please try again.",
       });
     }
+    // Remove Address Record
+    if (data) {
+      const { error: addError } = await supabase
+        .from("addresses")
+        .delete()
+        .eq("id", data.id);
+      if (addError) {
+        toast({
+          title: "Error occurred",
+          description:
+            "Error occurred while deleting student's address record, please try again.",
+        });
+      }
+    }
+
+    // FUTURE: Remove student enrolments
     navigate(0);
   };
 
@@ -85,16 +108,25 @@ export default function Students() {
         const name = `${row.original.first_name} ${row.original.middle_name} ${row.original.last_name}`;
         return (
           // Add avatar here later
-          <div className="flex items-center gap-4">
-            <Avatar className="w-8 h-8">
-              <AvatarImage src={row.original.avatar_url || ""} />
-              <AvatarFallback>
-                {row.original.first_name[0]}
-                {row.original.last_name[0]}
-              </AvatarFallback>
-            </Avatar>
-            <p>{name}</p>
-          </div>
+          <Link to={`/students/${row.original.id}`}>
+            <div className="flex items-center gap-4">
+              <Avatar className="w-8 h-8">
+                <AvatarImage
+                  src={
+                    supabase.storage
+                      .from("students")
+                      .getPublicUrl(row.original.avatar_url || "").data
+                      .publicUrl
+                  }
+                />
+                <AvatarFallback>
+                  {row.original.first_name[0]}
+                  {row.original.last_name[0]}
+                </AvatarFallback>
+              </Avatar>
+              <p>{name}</p>
+            </div>
+          </Link>
         );
       },
     },
@@ -204,7 +236,7 @@ export default function Students() {
   return (
     <>
       <div className="flex items-center mb-8 gap-4">
-        <h1 className="text-3xl font-bold">Students</h1>
+        <h1 className="text-3xl font-semibold">Students</h1>
         <Input
           onChange={(e) => setSearchQuery(e.currentTarget.value)}
           className="ml-auto max-w-72"
@@ -216,7 +248,7 @@ export default function Students() {
           variant={"default"}
         >
           <PlusIcon />
-          Add New Student
+          New Registeration
         </Button>
       </div>
       {isLoading ? (

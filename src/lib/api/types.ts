@@ -171,6 +171,32 @@ export type Database = {
         }
         Relationships: []
       }
+      cities: {
+        Row: {
+          id: number
+          name: string
+          state_id: number | null
+        }
+        Insert: {
+          id?: number
+          name?: string
+          state_id?: number | null
+        }
+        Update: {
+          id?: number
+          name?: string
+          state_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cities_state_id_fkey"
+            columns: ["state_id"]
+            isOneToOne: false
+            referencedRelation: "states"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contacts: {
         Row: {
           contact_name: string
@@ -198,6 +224,21 @@ export type Database = {
         }
         Relationships: []
       }
+      countries: {
+        Row: {
+          id: number
+          name: string
+        }
+        Insert: {
+          id?: number
+          name?: string
+        }
+        Update: {
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
       courses: {
         Row: {
           created_at: string
@@ -219,6 +260,129 @@ export type Database = {
           duration_years?: number
           id?: string
           name?: string
+        }
+        Relationships: []
+      }
+      enrollments: {
+        Row: {
+          batch_id: string | null
+          completion_date: string | null
+          course_id: string | null
+          created_at: string
+          current_year: number | null
+          enrollment_date: string | null
+          id: string
+          status: Database["public"]["Enums"]["enrollment_status"] | null
+          student_id: string | null
+        }
+        Insert: {
+          batch_id?: string | null
+          completion_date?: string | null
+          course_id?: string | null
+          created_at?: string
+          current_year?: number | null
+          enrollment_date?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["enrollment_status"] | null
+          student_id?: string | null
+        }
+        Update: {
+          batch_id?: string | null
+          completion_date?: string | null
+          course_id?: string | null
+          created_at?: string
+          current_year?: number | null
+          enrollment_date?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["enrollment_status"] | null
+          student_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enrollments_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enrollments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enrollments_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fee_structures: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          id: string
+          total_fee: number | null
+          year_number: number | null
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          total_fee?: number | null
+          year_number?: number | null
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          total_fee?: number | null
+          year_number?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fee_structures_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      receipts: {
+        Row: {
+          amount: number | null
+          created_at: string
+          id: string
+          payee: string | null
+          payment_date: string | null
+          payment_method: Database["public"]["Enums"]["payment_type"] | null
+          receipt_number: number
+          reference_number: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          id?: string
+          payee?: string | null
+          payment_date?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_type"] | null
+          receipt_number?: number
+          reference_number?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          id?: string
+          payee?: string | null
+          payment_date?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_type"] | null
+          receipt_number?: number
+          reference_number?: string | null
         }
         Relationships: []
       }
@@ -245,6 +409,176 @@ export type Database = {
           permissions?: Json | null
         }
         Relationships: []
+      }
+      states: {
+        Row: {
+          country_id: number | null
+          id: number
+          name: string
+        }
+        Insert: {
+          country_id?: number | null
+          id?: number
+          name?: string
+        }
+        Update: {
+          country_id?: number | null
+          id?: number
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "states_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_fee_summary: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          discount: number | null
+          final_fees: number | null
+          id: string
+          status: Database["public"]["Enums"]["fee_status"] | null
+          student_id: string | null
+          total_fees: number | null
+          year_number: number | null
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          discount?: number | null
+          final_fees?: number | null
+          id?: string
+          status?: Database["public"]["Enums"]["fee_status"] | null
+          student_id?: string | null
+          total_fees?: number | null
+          year_number?: number | null
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          discount?: number | null
+          final_fees?: number | null
+          id?: string
+          status?: Database["public"]["Enums"]["fee_status"] | null
+          student_id?: string | null
+          total_fees?: number | null
+          year_number?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_fee_summary_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_fee_summary_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_installments: {
+        Row: {
+          academic_year: number | null
+          created_at: string
+          due_date: string | null
+          fee_summary_id: string | null
+          id: string
+          installment_amount: number | null
+          installment_number: number | null
+          payment_status: Database["public"]["Enums"]["payment_status"] | null
+          receipt_id: string | null
+        }
+        Insert: {
+          academic_year?: number | null
+          created_at?: string
+          due_date?: string | null
+          fee_summary_id?: string | null
+          id?: string
+          installment_amount?: number | null
+          installment_number?: number | null
+          payment_status?: Database["public"]["Enums"]["payment_status"] | null
+          receipt_id?: string | null
+        }
+        Update: {
+          academic_year?: number | null
+          created_at?: string
+          due_date?: string | null
+          fee_summary_id?: string | null
+          id?: string
+          installment_amount?: number | null
+          installment_number?: number | null
+          payment_status?: Database["public"]["Enums"]["payment_status"] | null
+          receipt_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_installments_fee_summary_id_fkey"
+            columns: ["fee_summary_id"]
+            isOneToOne: false
+            referencedRelation: "student_fee_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_installments_receipt_id_fkey"
+            columns: ["receipt_id"]
+            isOneToOne: false
+            referencedRelation: "receipts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_registeration_fees: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_paid: boolean | null
+          receipt_id: string | null
+          registeration_fee: number
+          student_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_paid?: boolean | null
+          receipt_id?: string | null
+          registeration_fee?: number
+          student_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_paid?: boolean | null
+          receipt_id?: string | null
+          registeration_fee?: number
+          student_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_registeration_fees_receipt_id_fkey"
+            columns: ["receipt_id"]
+            isOneToOne: false
+            referencedRelation: "receipts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_registeration_fees_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       students: {
         Row: {
@@ -378,6 +712,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_fee_summary: {
+        Args: { enrollment_id: string }
+        Returns: undefined
+      }
       get_all_profiles: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -386,6 +724,21 @@ export type Database = {
           email: string
           created_at: string
         }[]
+      }
+      get_payment_history: {
+        Args: { p_student_id: string }
+        Returns: {
+          due_date: string
+          fee_type: string
+          description: string
+          amount: number
+          receipt_id: string
+          payment_status: string
+        }[]
+      }
+      get_timetable_by_slot: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
       }
     }
     Enums: {
@@ -398,7 +751,11 @@ export type Database = {
         | "Saturday"
         | "Sunday"
         | ""
+      enrollment_status: "Enrolled" | "Completed" | "Dropped"
+      fee_status: "Active" | "Cancelled"
       gender: "Male" | "Female"
+      payment_status: "Pending" | "Completed"
+      payment_type: "Cash" | "Cheque" | "UPI"
       relation: "Self" | "Father" | "Mother" | "Guardian"
     }
     CompositeTypes: {
@@ -528,7 +885,11 @@ export const Constants = {
         "Sunday",
         "",
       ],
+      enrollment_status: ["Enrolled", "Completed", "Dropped"],
+      fee_status: ["Active", "Cancelled"],
       gender: ["Male", "Female"],
+      payment_status: ["Pending", "Completed"],
+      payment_type: ["Cash", "Cheque", "UPI"],
       relation: ["Self", "Father", "Mother", "Guardian"],
     },
   },
