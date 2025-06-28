@@ -38,7 +38,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Enums, Tables } from "@/lib/api/types";
 import { supabase } from "@/lib/supabase";
 import { feeFns, feeKeys } from "@/query/fees";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ChevronLeft, Ellipsis } from "lucide-react";
 import { useState } from "react";
@@ -57,6 +57,7 @@ type regPayment = {
   amount: number | null;
   payment_date: string | null;
   payment_method: PaymentMethods;
+  reference_number: string | null;
 };
 
 type feePayment = regPayment & {
@@ -70,13 +71,15 @@ const initRegPayload: regPayment = {
   amount: 1500,
   payment_date: new Date().toISOString(),
   payment_method: "Cash",
+  reference_number: null,
 };
 const initFeePayload: feePayment = {
   installment_id: "",
   payee: "",
-  amount: 1500,
+  amount: null,
   payment_date: new Date().toISOString(),
   payment_method: "Cash",
+  reference_number: null,
 };
 const initDiscountPayload = {
   summary_id: "",
@@ -87,6 +90,7 @@ export default function FeeDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Data fetching part
   const { data: paymentSchedule, isLoading } = useQuery({
@@ -165,6 +169,12 @@ export default function FeeDetails() {
     }
     setInstallmentList(data.student_installments);
   };
+  const selectInstallment = async (value: string) => {
+    feePayloadChange("installment_id", value);
+    const amount =
+      installmentList.find((i) => i.id === value)?.installment_amount || null;
+    setFeePayload((prev) => ({ ...prev, amount, installment_id: value }));
+  };
 
   const submitFees = async () => {
     if (!feePayload.installment_id || !feePayload.payee || !feePayload.amount) {
@@ -208,6 +218,7 @@ export default function FeeDetails() {
     }
     resetFeePayload();
     setFeeSheetOpen(false);
+    refetchData();
   };
 
   // Handlers for Registeration fees
@@ -244,6 +255,22 @@ export default function FeeDetails() {
     discountPayloadChange("summary_id", data.id);
   };
   const submitRegFees = async () => {
+    //Valuidate payload
+    if (!regPayload.payee || !regPayload.amount || !regPayload.payment_date) {
+      toast({
+        title: "Missing Values",
+        description: "Please fill out missing values.",
+      });
+      return;
+    }
+    if (regPayload.payment_method !== "Cash" && !regPayload.reference_number) {
+      toast({
+        title: "Missing Reference Number",
+        description: "Please provide a reference number for non-cash payments.",
+      });
+      return;
+    }
+
     const { data: receipt, error } = await supabase
       .from("receipts")
       .insert(regPayload)
@@ -272,6 +299,8 @@ export default function FeeDetails() {
     }
     setRegisterationSheetOpen(false);
     setRegPayload(initRegPayload);
+    // Refresh the summary to reflect changes
+    refetchData();
   };
 
   // Handlers for Discount
@@ -302,6 +331,25 @@ export default function FeeDetails() {
     value: string | number | null
   ) => {
     setDiscountPayload((prev) => ({ ...prev, [key]: value }));
+  };
+
+  // Handler to refetch data
+  const refetchData = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: feeKeys.getPaymentSchedule(id!),
+      }),
+      queryClient.invalidateQueries({ queryKey: feeKeys.getSummary(id!) }),
+      queryClient.invalidateQueries({
+        queryKey: enrollmentKeys.getEnrollmentByStudentId(id!),
+      }),
+      queryClient.invalidateQueries({
+        queryKey: feeKeys.getPaymentHistory(id!),
+      }),
+      queryClient.invalidateQueries({
+        queryKey: studentKeys.getStudentById(id!),
+      }),
+    ]);
   };
 
   return (
@@ -385,7 +433,7 @@ export default function FeeDetails() {
                         <Select
                           value={feePayload.installment_id}
                           onValueChange={(value) => {
-                            feePayloadChange("installment_id", value);
+                            selectInstallment(value);
                           }}
                         >
                           <SelectTrigger>
@@ -452,11 +500,7 @@ export default function FeeDetails() {
                       </Label>
                       <Input
                         type={"text"}
-                        value={
-                          installmentList.find(
-                            (i) => i.id === feePayload.installment_id
-                          )?.installment_amount || undefined
-                        }
+                        value={feePayload.amount || undefined}
                       />
                     </div>
                     <div className="space-y-1">
@@ -532,6 +576,20 @@ export default function FeeDetails() {
                       </SelectContent>
                     </Select>
                   </div>
+                  {regPayload.payment_method !== "Cash" && (
+                    <div className="space-y-1">
+                      <Label className="text-xs text-foreground/70 font-normal">
+                        Reference Number
+                      </Label>
+                      <Input
+                        type="text"
+                        value={regPayload.reference_number || ""}
+                        onChange={(e) =>
+                          regPayloadChange("reference_number", e.target.value)
+                        }
+                      />
+                    </div>
+                  )}
                   <div className="space-y-1">
                     <Label className="text-xs text-foreground/70 font-normal">
                       Amount
