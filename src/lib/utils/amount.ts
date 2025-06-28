@@ -1,5 +1,5 @@
 export function numberToWords(num: number | null): string {
-  if(!num) return "";
+  if (!num) return "";
   if (isNaN(num) || num < 0) return "Invalid input";
 
   if (num === 0) return "zero";
@@ -80,6 +80,28 @@ export function numberToWords(num: number | null): string {
   }
 
   return capitalize(convert(num));
+}
+
+export function formatNumberIndian(num: number) {
+  if (num == null) return "0";
+
+  const numStr = num.toString();
+
+  // Split on decimal if present
+  const [intPart, decimalPart] = numStr.split(".");
+
+  // First 3 digits (from right)
+  let lastThree = intPart.slice(-3);
+  const otherNumbers = intPart.slice(0, -3);
+
+  if (otherNumbers !== "") {
+    lastThree = "," + lastThree;
+  }
+
+  const formattedOther = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",");
+  const result = formattedOther + lastThree;
+
+  return decimalPart ? result + "." + decimalPart : result;
 }
 
 function capitalize(str: string) {

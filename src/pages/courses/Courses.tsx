@@ -150,7 +150,7 @@ export default function CoursePage() {
   return (
     <>
       <div className="flex items-center mb-8">
-        <h1 className="text-3xl font-bold">Courses</h1>
+        <h1 className="text-3xl font-semibold">Courses</h1>
         <Button
           onClick={() => navigate("add")}
           className="ml-auto"

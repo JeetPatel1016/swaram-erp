@@ -35,20 +35,16 @@ const data: { navMain: NavGroup[] } = {
         },
       ],
     },
-    // {
-    //   title: "Financials",
-    //   url: "#",
-    //   items: [
-    //     {
-    //       title: "Fees Structure",
-    //       url: "/fees",
-    //     },
-    //     {
-    //       title: "Fee Reports",
-    //       url: "#",
-    //     },
-    //   ],
-    // },
+    {
+      title: "Financials",
+      url: "#",
+      items: [
+        {
+          title: "Fee Reports",
+          url: "/fee-reports",
+        },
+      ],
+    },
     {
       title: "Courses",
       url: "#",

@@ -30,6 +30,7 @@ import AdmissionForm from "@/templates/AdmissionForm";
 import FeeReceipt from "@/templates/FeeReceipt";
 import FeeDetails from "@/pages/fees/FeeDetails";
 import TimeTable from "@/pages/TimeTable";
+import FeeReports from "@/pages/feeReports/FeeReports";
 
 const router = createBrowserRouter([
   {
@@ -97,6 +98,11 @@ const router = createBrowserRouter([
                 path: "time-table",
                 index: true,
                 element: <TimeTable />,
+              },
+              {
+                path: "fee-reports",
+                index: true,
+                element: <FeeReports />,
               },
             ],
           },
