@@ -64,7 +64,7 @@ export default function FeeReports() {
                         data.registeration.collectedThisMonth
                       )}`}
                     />
-                    <Link to={"/pending/registeration"}>
+                    <Link to={"/pending-registeration"}>
                       <Metric
                         variant={"primary"}
                         label="Pending Students"
@@ -116,7 +116,7 @@ export default function FeeReports() {
                         data.installments.collectedThisMonth
                       )}`}
                     />
-                    <Link to={"/pending/installments"}>
+                    <Link to={"/pending-installments"}>
                       <Metric
                         variant="primary"
                         label="Overdue Students"
