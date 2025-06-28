@@ -19,8 +19,7 @@ import { useLocation } from "react-router-dom";
 type NavItem = { title: string; url: string; isActive?: boolean };
 type NavGroup = { title: string; url?: string; items: NavItem[] };
 
-const data: { versions: string[]; navMain: NavGroup[] } = {
-  versions: ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"],
+const data: { navMain: NavGroup[] } = {
   navMain: [
     {
       title: "Quick Links",
@@ -28,15 +27,11 @@ const data: { versions: string[]; navMain: NavGroup[] } = {
       items: [
         {
           title: "Students",
-          url: "#",
+          url: "/students",
         },
         {
           title: "Courses",
           url: "/courses",
-        },
-        {
-          title: "Fees",
-          url: "#",
         },
       ],
     },
@@ -45,12 +40,16 @@ const data: { versions: string[]; navMain: NavGroup[] } = {
       url: "#",
       items: [
         {
-          title: "Fees Structure",
-          url: "#",
+          title: "Fee Reports",
+          url: "/fee-reports",
         },
         {
-          title: "Fee Reports",
-          url: "#",
+          title: "Pending Installments",
+          url: "/pending-installments",
+        },
+        {
+          title: "Pending Registeration Fees",
+          url: "/pending-registeration",
         },
       ],
     },
@@ -64,7 +63,7 @@ const data: { versions: string[]; navMain: NavGroup[] } = {
         },
         {
           title: "Time Table",
-          url: "#",
+          url: "/time-table",
         },
       ],
     },

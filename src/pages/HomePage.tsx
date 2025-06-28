@@ -1,4 +1,14 @@
 import { useSession } from "@/auth/SessionContext";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { reportKeys, reportsFns } from "@/query/reports";
+import { useQuery } from "@tanstack/react-query";
+import {
+  LucideBook,
+  LucideCircleCheckBig,
+  LucideUser,
+  LucideUsers,
+} from "lucide-react";
 import { FiUser, FiBook, FiDollarSign, FiChevronRight } from "react-icons/fi";
 import { Link } from "react-router-dom";
 function generateGreeting(name: string) {
@@ -35,8 +45,8 @@ const quickLinks: QuickLink[] = [
     Icon: (className) => <FiBook className={className} />,
   },
   {
-    title: "Fees",
-    url: "/fees",
+    title: "Fees Report",
+    url: "/fee-reports",
     Icon: (className) => <FiDollarSign className={className} />,
   },
 ];
@@ -45,9 +55,14 @@ export default function HomePage() {
   const { session } = useSession();
   const name = session?.user.user_metadata.display_name;
 
+  const { data, isLoading } = useQuery({
+    queryKey: reportKeys.getDashboardMetrics(),
+    queryFn: () => reportsFns.getDashboardMetrics(),
+  });
+
   return (
     <>
-      <div className="select-none w-full bg-gradient-to-br p-6 from-primary to-primary/65 rounded-xl flex flex-col text-white items-center">
+      <div className="select-none w-full bg-gradient-to-br p-6 from-primary to-rose-500 rounded-xl flex flex-col text-white items-center">
         <h1 className="text-3xl md:text-4xl mt-4 mb-2 text-center">
           {generateGreeting(name)}
         </h1>
@@ -67,6 +82,76 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
+      </div>
+      <div className="flex flex-col md:flex-row grid-cols-1 items-stretch gap-4 mt-8">
+        <Card className="sm:w-full md:w-1/2 lg:w-1/4">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <p className="text-muted-foreground">Total Students</p>
+              <div className="ml-auto bg-red-400/20 p-2 rounded-full">
+                <LucideUser size={20} className="text-red-600" />
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <Skeleton className="h-8 rounded w-20" />
+            ) : (
+              <p className="text-3xl font-semibold">{data?.totalStudents}</p>
+            )}
+          </CardContent>
+        </Card>
+        <Card className="sm:w-full md:w-1/2 lg:w-1/4">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <p className="text-muted-foreground">Total Courses</p>
+              <div className="ml-auto bg-red-400/20 p-2 rounded-full">
+                <LucideBook size={20} className="text-red-600" />
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <Skeleton className="h-8 rounded w-20" />
+            ) : (
+              <p className="text-3xl font-semibold">{data?.totalCourses}</p>
+            )}
+          </CardContent>
+        </Card>
+        <Card className="sm:w-full md:w-1/2 lg:w-1/4">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <p className="text-muted-foreground">Total Batches</p>
+              <div className="ml-auto bg-red-400/20 p-2 rounded-full">
+                <LucideUsers size={20} className="text-red-600" />
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <Skeleton className="h-8 rounded w-20" />
+            ) : (
+              <p className="text-3xl font-semibold">{data?.totalBatches}</p>
+            )}
+          </CardContent>
+        </Card>
+        <Card className="sm:w-full md:w-1/2 lg:w-1/4">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <p className="text-muted-foreground">Total Enrollments</p>
+              <div className="ml-auto bg-red-400/20 p-2 rounded-full">
+                <LucideCircleCheckBig size={20} className="text-red-600" />
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <Skeleton className="h-8 rounded w-20" />
+            ) : (
+              <p className="text-3xl font-semibold">{data?.totalEnrollments}</p>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </>
   );

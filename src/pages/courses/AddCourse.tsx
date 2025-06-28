@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -55,47 +56,53 @@ export default function AddCourse() {
         <ChevronLeft className="cursor-pointer" onClick={() => navigate(-1)} />
         <h1 className="text-3xl font-bold">Add New Course</h1>
       </div>
-      <form
-        onSubmit={handleFormSubmit}
-        className="flex flex-col md:w-1/2 lg:w-1/3 gap-4"
-      >
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="name">Course Name</Label>
-          <Input
-            type="text"
-            id="name"
-            name="name"
-            value={details.name}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="duration_years">Duration Years</Label>
-          <Input
-            type="number"
-            min={1}
-            id="duration_years"
-            name="duration_years"
-            onChange={handleInputChange}
-            value={details.duration_years}
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
-            name="description"
-            onChange={handleInputChange}
-            value={details.description || ""}
-          />
-        </div>
-        <div className="flex gap-2">
-          <Button variant="default" type="submit" disabled={isLoading}>
-            {isLoading ? <CgSpinner className="animate-spin" /> : "Add"}
-          </Button>
-          <Button variant="ghost">Cancel</Button>
-        </div>
-      </form>
+      <Card className="lg:w-1/2">
+        <CardHeader>
+          <h3 className="text-2xl font-medium">Course Details</h3>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="name">Course Name</Label>
+              <Input
+                type="text"
+                id="name"
+                name="name"
+                value={details.name}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="duration_years">Duration Years</Label>
+              <Input
+                type="number"
+                min={1}
+                id="duration_years"
+                name="duration_years"
+                onChange={handleInputChange}
+                value={details.duration_years}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                name="description"
+                onChange={handleInputChange}
+                value={details.description || ""}
+              />
+            </div>
+            <div className="flex gap-2 mt-2">
+              <Button className={"ml-auto"} variant="ghost">
+                Cancel
+              </Button>
+              <Button variant="default" type="submit" disabled={isLoading}>
+                {isLoading ? <CgSpinner className="animate-spin" /> : "Add"}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </>
   );
 }

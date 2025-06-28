@@ -1,71 +1,66 @@
 import Loader from "@/components/Loader";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Tables } from "@/lib/api/types";
+import { TablesInsert, TablesUpdate } from "@/lib/api/types";
 import { supabase } from "@/lib/supabase";
+import { courseFns, courseKeys } from "@/query/courses";
+import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
-import {
-  ChangeEventHandler,
-  FormEventHandler,
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 import { CgSpinner } from "react-icons/cg";
 import { useNavigate, useParams } from "react-router-dom";
 
-type Course = Tables<"courses">;
-
+type CourseUpdate = TablesUpdate<"courses">;
+type FeeStructure = TablesInsert<"fee_structures">;
 export default function EditCourse() {
   // Use the id to fetch course details
   const { id } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [courseDetails, setCourseDetails] = useState<Course | null>(null);
+  const { data: courseDetails, isLoading: isCourseLoading } = useQuery({
+    queryKey: courseKeys.getCourseById(id as string),
+    queryFn: () => courseFns.getCourseByIdFn(id!),
+  });
+
+  const [coursePayload, setCoursePayload] = useState<CourseUpdate>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [updateDiff, setUpdateDiff] = useState(false);
 
   useEffect(() => {
-    // fetching data from "API"
-    const fetchCourseDetails = async () => {
-      const { data, error } = await supabase
-        .from("courses")
-        .select()
-        .eq("id", id!);
-      if (error) {
-        toast({
-          title: "Error occurred",
-          description: "Error occurred while fetching data, please try again",
-          variant: "destructive",
-        });
-        return;
-      }
-      if (data) setCourseDetails(data[0]);
-    };
-    fetchCourseDetails();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+    if (courseDetails) {
+      setCoursePayload({
+        name: courseDetails.name,
+        duration_years: courseDetails.duration_years,
+        description: courseDetails.description,
+      });
+    }
+  }, [courseDetails]);
 
-  const handleInputChange: ChangeEventHandler<
-    HTMLInputElement | HTMLTextAreaElement
-  > = (e) => {
-    const target = e.currentTarget;
-    const { name, value } = target;
-    setCourseDetails((courseDetails) => ({
-      ...courseDetails!,
-      [name as keyof Course]: value,
-    }));
+  const handleCourseInput = ({
+    key,
+    value,
+  }: {
+    key: keyof CourseUpdate;
+    value: string;
+  }) => {
+    setCoursePayload((prev) => ({ ...prev, [key]: value }));
+    if (!updateDiff) setUpdateDiff(true);
   };
 
-  const handleFormSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
-    e.preventDefault();
+  const handleFormSubmit = async () => {
     // Data is updated or error is toasted.
     setIsLoading(true);
+
+    const newYears = coursePayload.duration_years!;
+    const oldYears = courseDetails!.duration_years!;
     const { error } = await supabase
       .from("courses")
       .update({
-        ...courseDetails,
+        ...coursePayload,
       })
       .eq("id", id!);
 
@@ -78,65 +73,136 @@ export default function EditCourse() {
       setIsLoading(false);
       return;
     }
+
+    if (newYears > oldYears) {
+      const newEntries: FeeStructure[] = Array.from(
+        { length: newYears - oldYears },
+        (_, i) => ({
+          course_id: id!,
+          year_number: oldYears + i + 1,
+        })
+      );
+      const { error: insertError } = await supabase
+        .from("fee_structures")
+        .insert(newEntries);
+      if (insertError) {
+        toast({
+          title: "Error Occurred",
+          description:
+            "Error occurred updating fee structure, please try again.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+    } else if (newYears < oldYears) {
+      const { error: deleteError } = await supabase
+        .from("fee_structures")
+        .delete()
+        .eq("course_id", id!)
+        .gt("year_number", newYears);
+      if (deleteError) {
+        toast({
+          title: "Error Occurred",
+          description:
+            "Error occurred updating fee structure, please try again.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+    }
     setIsLoading(false);
     navigate("/courses");
   };
 
   return (
     <>
-      {courseDetails ? (
-        <>
-          <div className="flex gap-4 items-center mb-8">
-            <ChevronLeft
-              className="cursor-pointer"
-              onClick={() => navigate(-1)}
-            />
-            <h1 className="text-3xl font-bold">Edit Course Details</h1>
-          </div>
-          <form
-            onSubmit={handleFormSubmit}
-            className="flex flex-col md:w-1/2 lg:w-1/3 gap-4"
-          >
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="name">Course Name</Label>
-              <Input
-                type="text"
-                id="name"
-                name="name"
-                value={courseDetails.name}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="duration_years">Duration Years</Label>
-              <Input
-                type="number"
-                min={1}
-                id="duration_years"
-                name="duration_years"
-                onChange={handleInputChange}
-                value={courseDetails.duration_years}
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                name="description"
-                onChange={handleInputChange}
-                value={courseDetails.description || ""}
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button variant="default" type="submit" disabled={isLoading}>
-                {isLoading ? <CgSpinner className="animate-spin" /> : "Save"}
-              </Button>
-              <Button variant="ghost">Cancel</Button>
-            </div>
-          </form>
-        </>
-      ) : (
+      {isCourseLoading ? (
         <Loader />
+      ) : (
+        <>
+          {courseDetails && (
+            <>
+              <div className="flex gap-4 items-center mb-8">
+                <ChevronLeft
+                  className="cursor-pointer"
+                  onClick={() => navigate(-1)}
+                />
+                <h1 className="text-3xl font-bold">Edit Course Details</h1>
+              </div>
+              <div className="flex flex-col lg:flex-row gap-8">
+                <Card className="lg:w-1/2">
+                  <CardHeader>
+                    <h3 className="text-xl font-medium">General Details</h3>
+                  </CardHeader>
+                  <CardContent>
+                    <form
+                      onSubmit={handleFormSubmit}
+                      className="flex flex-col gap-4"
+                    >
+                      <div className="flex flex-col gap-2">
+                        <Label htmlFor="name">Course Name</Label>
+                        <Input
+                          type="text"
+                          id="name"
+                          name="name"
+                          value={coursePayload.name}
+                          onChange={(e) => {
+                            const { value } = e.currentTarget;
+                            handleCourseInput({ key: "name", value });
+                          }}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <Label htmlFor="duration_years">Duration Years</Label>
+                        <Input
+                          type="number"
+                          min={1}
+                          id="duration_years"
+                          name="duration_years"
+                          onChange={(e) => {
+                            const { value } = e.currentTarget;
+                            handleCourseInput({ key: "duration_years", value });
+                          }}
+                          value={coursePayload.duration_years}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea
+                          id="description"
+                          name="description"
+                          onChange={(e) => {
+                            const { value } = e.currentTarget;
+                            handleCourseInput({ key: "description", value });
+                          }}
+                          value={coursePayload.description || ""}
+                        />
+                      </div>
+                    </form>
+                  </CardContent>
+                </Card>
+              </div>
+              <div className="flex mt-4 justify-end w-full gap-2">
+                {updateDiff && (
+                  <Button
+                    variant="default"
+                    onClick={handleFormSubmit}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <CgSpinner className="animate-spin" />
+                    ) : (
+                      "Save"
+                    )}
+                  </Button>
+                )}
+                <Button variant="ghost">Cancel</Button>
+              </div>
+            </>
+          )}
+        </>
       )}
     </>
   );

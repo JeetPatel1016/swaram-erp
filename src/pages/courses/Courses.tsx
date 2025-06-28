@@ -116,11 +116,23 @@ export default function CoursePage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
+                onClick={() => navigate(`/courses/${course.id}`)}
+              >
+                View Course Details
+              </DropdownMenuItem>
+              <DropdownMenuItem
                 onClick={() => {
                   navigate(`/courses/edit/${course.id}`);
                 }}
               >
                 Edit Course Details
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  navigate(`/courses/edit/${course.id}/fee-structure`);
+                }}
+              >
+                Edit Course Fees
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
@@ -138,7 +150,7 @@ export default function CoursePage() {
   return (
     <>
       <div className="flex items-center mb-8">
-        <h1 className="text-3xl font-bold">Courses</h1>
+        <h1 className="text-3xl font-semibold">Courses</h1>
         <Button
           onClick={() => navigate("add")}
           className="ml-auto"

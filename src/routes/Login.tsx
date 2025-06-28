@@ -8,11 +8,13 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { useSession } from "@/auth/SessionContext";
 import { CgSpinner } from "react-icons/cg";
+import { useTheme } from "@/providers/theme-provider";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { theme } = useTheme();
 
   const { toast } = useToast();
 
@@ -39,7 +41,15 @@ export default function Login() {
 
   return (
     <div className="w-screen h-screen overflow-hidden flex items-center justify-center flex-col gap-4">
-      <img src="/logo.svg" className="w-48 md:w-52 mb-8" />
+      <img
+        src={
+          theme === "dark"
+            ? "/swaram-logo-full-dark.png"
+            : "/swaram-logo-full.png"
+        }
+        draggable="false"
+        className="w-72 mb-8"
+      />
       <Card className="py-6 md:px-6 w-[90%] max-w-[500px]">
         <CardTitle className="text-xl md:text-2xl text-center mb-8">
           Sign in to your account

@@ -6,13 +6,13 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
+  SelectValue
 } from "@/components/ui/select";
 import { TimePicker } from "@/components/ui/time-picker";
 import { useToast } from "@/hooks/use-toast";
 import { Enums, TablesInsert } from "@/lib/api/types";
 import { supabase } from "@/lib/supabase";
 import { batchFns, batchKeys } from "@/query/batches";
-import { SelectValue } from "@radix-ui/react-select";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, CircleMinus, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -181,7 +181,7 @@ export default function EditTimings() {
                   className="cursor-pointer"
                   onClick={() => navigate(-1)}
                 />
-                <h1 className="text-3xl font-bold">Edit Batch Timings</h1>
+                <h1 className="text-3xl font-bold">Edit Batch Timings - {batchDetails.name}</h1>
               </div>
               <div className="flex flex-col xl:flex-row gap-8 mb-4">
                 <Card className="xl:w-1/2">
