@@ -31,6 +31,8 @@ import FeeReceipt from "@/templates/FeeReceipt";
 import FeeDetails from "@/pages/fees/FeeDetails";
 import TimeTable from "@/pages/TimeTable";
 import FeeReports from "@/pages/feeReports/FeeReports";
+import PendingInstallments from "@/pages/pending/Installments";
+import PendingRegisterationFees from "@/pages/pending/Registeration";
 
 const router = createBrowserRouter([
   {
@@ -103,6 +105,16 @@ const router = createBrowserRouter([
                 path: "fee-reports",
                 index: true,
                 element: <FeeReports />,
+              },
+              {
+                path: "pending-installments",
+                index: true,
+                element: <PendingInstallments />,
+              },
+              {
+                path: "pending-registeration",
+                index: true,
+                element: <PendingRegisterationFees   />,
               },
             ],
           },

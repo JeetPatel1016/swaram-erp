@@ -43,6 +43,14 @@ const data: { navMain: NavGroup[] } = {
           title: "Fee Reports",
           url: "/fee-reports",
         },
+        {
+          title: "Pending Installments",
+          url: "/pending-installments",
+        },
+        {
+          title: "Pending Registeration Fees",
+          url: "/pending-registeration",
+        },
       ],
     },
     {
