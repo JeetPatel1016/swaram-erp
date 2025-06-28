@@ -29,7 +29,18 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { QueryData } from "@supabase/supabase-js";
+
 type Student = Tables<"students">;
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const studentContactQuery = supabase
+  .from("students")
+  .select("*, students_contacts(*)")
+  .single();
+
+type StudentWithContacts = QueryData<typeof studentContactQuery>;
 
 export default function Students() {
   const navigate = useNavigate();
@@ -59,43 +70,230 @@ export default function Students() {
     });
   }, [students, searchQuery]);
 
+  // State for multiple row selections.
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  // Helper to toggle ID in selection
+  const toggleId = (id: string) => {
+    setSelectedIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) newSet.delete(id);
+      else newSet.add(id);
+      return newSet;
+    });
+  };
+
+  // Helper to toggle all visible (filteredStudents) selection
+  const toggleAllVisible = (checked: boolean) => {
+    setSelectedIds((prev) => {
+      const newSet = new Set(prev);
+      if (checked) {
+        filteredStudents?.forEach((s) => newSet.add(s.id));
+      } else {
+        filteredStudents?.forEach((s) => newSet.delete(s.id));
+      }
+      return newSet;
+    });
+  };
+
+  const deleteStudentByData = async (student: StudentWithContacts) => {
+    // Delete student record
+    const { error: studentError } = await supabase
+      .from("students")
+      .delete()
+      .eq("id", student.id);
+
+    if (studentError) {
+      toast({
+        title: "Error occurred",
+        description: `Error deleting student with ID ${student.id}.`,
+      });
+    }
+
+    // Delete address
+    const { error: addressError } = await supabase
+      .from("addresses")
+      .delete()
+      .eq("id", student.id);
+
+    if (addressError) {
+      toast({
+        title: "Error occurred",
+        description: `Error deleting address for student ID ${student.id}.`,
+      });
+    }
+
+    // Delete orphan contacts
+    const contactsList = student.students_contacts.map((r) => r.contact_id);
+    const { error: contactsError } = await supabase
+      .from("contacts")
+      .delete()
+      .in("id", contactsList);
+    if (contactsError) {
+      toast({
+        title: "Error occurred",
+        description: `Error deleting contacts for student ID ${student.id}.`,
+      });
+    }
+    // Delete avatar from storage if exists
+    if (student.avatar_url) {
+      const { error: storageError } = await supabase.storage
+        .from("students")
+        .remove([student.avatar_url]);
+
+      if (storageError) {
+        toast({
+          title: "Error occurred",
+          description: `Error deleting avatar for student ID ${student.id}.`,
+        });
+      }
+    }
+  };
+
   // Method to remove student record
   const removeStudent = async (id: string) => {
     const { data } = await supabase
       .from("students")
-      .select("*")
+      .select("*, students_contacts(*)")
       .eq("id", id)
       .single();
 
-    // Remove Student record
-    const { error } = await supabase.from("students").delete().eq("id", id);
-    if (error) {
+    if (error || !data) {
       toast({
         title: "Error occurred",
-        description: "Error occurred while deleting student, please try again.",
+        description: "Error fetching student record. Please try again.",
+      });
+      return;
+    }
+    await deleteStudentByData(data);
+    navigate(0);
+  };
+
+  // Mthod to bulk remove records
+  const deleteSelected = async () => {
+    // Do here everything.
+    const ids = [...selectedIds];
+    if (selectedIds.size === 0) return;
+    const { data, error } = await supabase
+      .from("students")
+      .select("*, students_contacts(*)")
+      .in("id", ids);
+
+    if (error || !data) {
+      toast({
+        title: "Error",
+        description: "Could not fetch student records for deletion.",
+      });
+      return;
+    }
+
+    if (data.length === 0) {
+      toast({
+        title: "No Records",
+        description: "No student records found for deletion.",
+      });
+      return;
+    }
+
+    // Bulk delete student rows
+    const { error: deleteError } = await supabase
+      .from("students")
+      .delete()
+      .in("id", ids);
+
+    if (deleteError) {
+      toast({
+        title: "Error occurred",
+        description: "Error deleting student records. Please try again.",
       });
     }
-    // Remove Address Record
-    if (data) {
-      const { error: addError } = await supabase
-        .from("addresses")
-        .delete()
-        .eq("id", data.id);
-      if (addError) {
+    // Bulk delete address rows
+    const { error: addressError } = await supabase
+      .from("addresses")
+      .delete()
+      .in("id", ids);
+
+    if (addressError) {
+      toast({
+        title: "Error occurred",
+        description: "Error deleting address records. Please try again.",
+      });
+    }
+
+    // Remove all contacts
+    const contactsList = data
+      .map((r) => r.students_contacts.map((s) => s.contact_id))
+      .flat();
+
+    const { error: contactsError } = await supabase
+      .from("contacts")
+      .delete()
+      .in("id", contactsList);
+    if (contactsError) {
+      toast({
+        title: "Error occurred.",
+        description: `Error deleting contacts for selected students`,
+      });
+    }
+
+    // Collect all avatar paths
+    const avatarPaths = data
+      .filter((student) => student.avatar_url)
+      .map((student) => student.avatar_url as string);
+
+    if (avatarPaths.length > 0) {
+      const { error: storageError } = await supabase.storage
+        .from("students")
+        .remove(avatarPaths);
+
+      if (storageError) {
         toast({
           title: "Error occurred",
-          description:
-            "Error occurred while deleting student's address record, please try again.",
+          description: "Error deleting student avatars from storage.",
         });
       }
     }
 
-    // FUTURE: Remove student enrolments
+    toast({
+      title: "Success",
+      description: `${ids.length} student(s) deleted successfully.`,
+    });
+
+    // Refetch data.
     navigate(0);
+    setSelectedIds(new Set());
   };
 
   // Defining columns for our datatable
   const columns: ColumnDef<Student>[] = [
+    {
+      id: "select",
+      header: () => {
+        const checkedValue =
+          filteredStudents && filteredStudents.length === 0
+            ? false
+            : filteredStudents!.every((s) => selectedIds.has(s.id))
+            ? true
+            : filteredStudents!.some((s) => selectedIds.has(s.id))
+            ? "indeterminate"
+            : false;
+        return (
+          <Checkbox
+            checked={checkedValue}
+            onCheckedChange={(checked) => toggleAllVisible(!!checked)}
+            aria-label="Select all"
+          />
+        );
+      },
+      cell: ({ row }) => (
+        <Checkbox
+          checked={selectedIds.has(row.original.id)}
+          onCheckedChange={() => toggleId(row.original.id)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
     {
       accessorKey: "gr_no",
       header: () => <p className="pl-4">GR NO.</p>,
@@ -261,6 +459,25 @@ export default function Students() {
             </div>
           ) : (
             <DataTable columns={columns} data={filteredStudents!} />
+          )}
+          {/* Popup below the table */}
+          {selectedIds.size > 0 && (
+            <div className="fixed bg-background bottom-4 left-1/2 transform -translate-x-1/2 z-50 rounded-md shadow-md px-4 py-2 border border-border flex items-center gap-2 text-sm">
+              <p className="mr-8">
+                {selectedIds.size} record{selectedIds.size !== 1 && "s"}{" "}
+                selected
+              </p>
+              <Button variant="destructive" size="sm" onClick={deleteSelected}>
+                Delete Selected
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setSelectedIds(new Set())}
+              >
+                Clear Selection
+              </Button>
+            </div>
           )}
         </>
       )}
