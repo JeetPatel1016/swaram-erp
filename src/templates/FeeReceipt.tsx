@@ -6,9 +6,7 @@ import {
   View,
   StyleSheet,
   Image,
-  Font,
 } from "@react-pdf/renderer";
-import condensedSource from "/RobotoCondensed-VariableFont.ttf";
 
 import { useNavigate, useParams } from "react-router-dom";
 import { numberToWords } from "@/lib/utils/amount";
@@ -17,25 +15,12 @@ import { receiptFns, receiptKeys } from "@/query/receipts";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/Loader";
 
-Font.register({ family: "RobotoCondensed", src: condensedSource });
-Font.register({
-  family: "Roboto",
-  fonts: [
-    { src: "/Roboto-300.ttf", fontWeight: 300 },
-    { src: "/Roboto-400.ttf" },
-    { src: "/Roboto-500.ttf", fontWeight: 500 },
-    { src: "/Roboto-600.ttf", fontWeight: 600 },
-    { src: "/Roboto-700.ttf", fontWeight: 700 },
-  ],
-});
-
 // Create styles
 const styles = StyleSheet.create({
   page: {
     flexDirection: "column",
     backgroundColor: "white",
     alignItems: "center",
-    fontFamily: "Roboto",
     fontWeight: 400,
   },
   banner: {
@@ -46,7 +31,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: "16px",
     paddingVertical: "4px",
     justifyContent: "center",
-    fontFamily: "RobotoCondensed",
     flexDirection: "row",
   },
   section: {
@@ -82,7 +66,7 @@ export default function FeeReceipt() {
                 <Page size="A4" style={styles.page}>
                   {/* Logo */}
                   <Image
-                    source={"/swaramlogo.jpg"}
+                    source={"/swaram-erp/swaramlogo.jpg"}
                     style={{ objectFit: "cover", width: "45%" }}
                   />
                   {/* Details Banner */}

@@ -34,114 +34,117 @@ import FeeReports from "@/pages/feeReports/FeeReports";
 import PendingInstallments from "@/pages/pending/Installments";
 import PendingRegisterationFees from "@/pages/pending/Registeration";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Root />,
-    children: [
-      // Public Routes
-      { path: "login", element: <Login /> },
-      {
-        // Private Routes
-        path: "/",
-        element: <AuthGuard />,
-        children: [
-          {
-            path: "/",
-            element: <App />,
-            children: [
-              { path: "/", element: <HomePage /> },
-              {
-                path: "courses",
-                children: [
-                  {
-                    index: true,
-                    element: <CoursePage />,
-                  },
-                  { path: ":id", element: <CourseDetails /> },
-                  { path: "add", element: <AddCourse /> },
-                  { path: "edit/:id", element: <EditCourse /> },
-                  {
-                    path: "edit/:id/fee-structure",
-                    element: <EditCourseFees />,
-                  },
-                ],
-              },
-              {
-                path: "batches",
-                element: <BatchLayout />,
-                children: [
-                  { index: true, element: <BatchPage /> },
-                  { path: "add", element: <AddBatch /> },
-                  { path: "edit/:id", element: <EditBatch /> },
-                  { path: "edit/:id/timings", element: <EditTimings /> },
-                  { path: "edit/:id/courses", element: <EditBatchCourses /> },
-                  { path: ":id", element: <BatchDetails /> },
-                ],
-              },
-              {
-                path: "students",
-                children: [
-                  { index: true, element: <Students /> },
-                  { path: "add", element: <AddStudent /> },
-                  { path: "edit/:id", element: <EditStudentDetails /> },
-                  { path: ":id", element: <StudentDetails /> },
-                ],
-              },
-              {
-                path: "enrollment",
-                children: [{ path: ":id", element: <EnrollStudent /> }],
-              },
-              {
-                path: "fees",
-                children: [{ path: ":id", element: <FeeDetails /> }],
-              },
-              {
-                path: "time-table",
-                index: true,
-                element: <TimeTable />,
-              },
-              {
-                path: "fee-reports",
-                index: true,
-                element: <FeeReports />,
-              },
-              {
-                path: "pending-installments",
-                index: true,
-                element: <PendingInstallments />,
-              },
-              {
-                path: "pending-registeration",
-                index: true,
-                element: <PendingRegisterationFees   />,
-              },
-            ],
-          },
-          {
-            path: "admission-form",
-            children: [
-              {
-                path: ":id",
-                element: <AdmissionForm />,
-              },
-            ],
-          },
-          {
-            path: "receipts",
-            children: [
-              {
-                path: ":id",
-                element: <FeeReceipt />,
-              },
-            ],
-          },
-        ],
-      },
-    ],
-    errorElement: <NotFoundPage />,
-  },
-]);
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <Root />,
+      children: [
+        // Public Routes
+        { path: "login", element: <Login /> },
+        {
+          // Private Routes
+          path: "/",
+          element: <AuthGuard />,
+          children: [
+            {
+              path: "/",
+              element: <App />,
+              children: [
+                { path: "/", element: <HomePage /> },
+                {
+                  path: "courses",
+                  children: [
+                    {
+                      index: true,
+                      element: <CoursePage />,
+                    },
+                    { path: ":id", element: <CourseDetails /> },
+                    { path: "add", element: <AddCourse /> },
+                    { path: "edit/:id", element: <EditCourse /> },
+                    {
+                      path: "edit/:id/fee-structure",
+                      element: <EditCourseFees />,
+                    },
+                  ],
+                },
+                {
+                  path: "batches",
+                  element: <BatchLayout />,
+                  children: [
+                    { index: true, element: <BatchPage /> },
+                    { path: "add", element: <AddBatch /> },
+                    { path: "edit/:id", element: <EditBatch /> },
+                    { path: "edit/:id/timings", element: <EditTimings /> },
+                    { path: "edit/:id/courses", element: <EditBatchCourses /> },
+                    { path: ":id", element: <BatchDetails /> },
+                  ],
+                },
+                {
+                  path: "students",
+                  children: [
+                    { index: true, element: <Students /> },
+                    { path: "add", element: <AddStudent /> },
+                    { path: "edit/:id", element: <EditStudentDetails /> },
+                    { path: ":id", element: <StudentDetails /> },
+                  ],
+                },
+                {
+                  path: "enrollment",
+                  children: [{ path: ":id", element: <EnrollStudent /> }],
+                },
+                {
+                  path: "fees",
+                  children: [{ path: ":id", element: <FeeDetails /> }],
+                },
+                {
+                  path: "time-table",
+                  index: true,
+                  element: <TimeTable />,
+                },
+                {
+                  path: "fee-reports",
+                  index: true,
+                  element: <FeeReports />,
+                },
+                {
+                  path: "pending-installments",
+                  index: true,
+                  element: <PendingInstallments />,
+                },
+                {
+                  path: "pending-registeration",
+                  index: true,
+                  element: <PendingRegisterationFees />,
+                },
+              ],
+            },
+            {
+              path: "admission-form",
+              children: [
+                {
+                  path: ":id",
+                  element: <AdmissionForm />,
+                },
+              ],
+            },
+            {
+              path: "receipts",
+              children: [
+                {
+                  path: ":id",
+                  element: <FeeReceipt />,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      errorElement: <NotFoundPage />,
+    },
+  ],
+  { basename: "/swaram-erp" }
+);
 
 createRoot(document.getElementById("root")!).render(
   <RouterProvider router={router} />

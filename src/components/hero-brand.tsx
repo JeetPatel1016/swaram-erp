@@ -7,7 +7,7 @@ export default function HeroBrand() {
     <Link to="/">
       <div className="p-2 flex gap-4 items-center">
         <img
-          src={theme === "dark" ? "/logo-dark.png" : "/logo.png"}
+          src={theme === "dark" ? "/swaram-erp/logo-dark.png" : "/swaram-erp/logo.png"}
           alt="Logo"
           className="object-contain h-8 w-8"
         />

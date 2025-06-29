@@ -44,8 +44,8 @@ export default function Login() {
       <img
         src={
           theme === "dark"
-            ? "/swaram-logo-full-dark.png"
-            : "/swaram-logo-full.png"
+            ? "/swaram-erp/swaram-logo-full-dark.png"
+            : "/swaram-erp/swaram-logo-full.png"
         }
         draggable="false"
         className="w-72 mb-8"

@@ -27,11 +27,11 @@ const data: { navMain: NavGroup[] } = {
       items: [
         {
           title: "Students",
-          url: "/students",
+          url: "/swaram-erp/students",
         },
         {
           title: "Courses",
-          url: "/courses",
+          url: "/swaram-erp/courses",
         },
       ],
     },
@@ -41,15 +41,15 @@ const data: { navMain: NavGroup[] } = {
       items: [
         {
           title: "Fee Reports",
-          url: "/fee-reports",
+          url: "/swaram-erp/fee-reports",
         },
         {
           title: "Pending Installments",
-          url: "/pending-installments",
+          url: "/swaram-erp/pending-installments",
         },
         {
           title: "Pending Registeration Fees",
-          url: "/pending-registeration",
+          url: "/swaram-erp/pending-registeration",
         },
       ],
     },
@@ -59,11 +59,11 @@ const data: { navMain: NavGroup[] } = {
       items: [
         {
           title: "Batches",
-          url: "/batches",
+          url: "/swaram-erp/batches",
         },
         {
           title: "Time Table",
-          url: "/time-table",
+          url: "/swaram-erp/time-table",
         },
       ],
     },
