@@ -12,7 +12,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { TablesUpdate } from "@/lib/api/types";
 import { supabase } from "@/lib/supabase";
-import { feeFns, feeKeys } from "@/query/fees";
+import { courseFns, courseKeys } from "@/query/courses";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -25,19 +25,19 @@ export default function EditCourseFees() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const {
-    data: feeData,
+    data: courseData,
     error,
     isLoading,
   } = useQuery({
-    queryKey: feeKeys.getFeeStructureByCourseFn(courseId as string),
-    queryFn: () => feeFns.getFeeStructureByCourseFn(courseId!),
+    queryKey: courseKeys.getCourseById(courseId as string),
+    queryFn: () => courseFns.getCourseByIdFn(courseId!),
   });
 
   const [feePayload, setFeePayload] = useState<FeeStructure[]>([]);
   const [updateDiff, setUpdateDiff] = useState(false);
   useEffect(() => {
-    if (feeData) {
-      const payload: FeeStructure[] = feeData.map((fee) => ({
+    if (courseData?.fee_structures) {
+      const payload: FeeStructure[] = courseData.fee_structures.map((fee) => ({
         id: fee.id,
         year_number: fee.year_number,
         total_fee: fee.total_fee,
@@ -46,7 +46,7 @@ export default function EditCourseFees() {
 
       setFeePayload(payload);
     }
-  }, [feeData]);
+  }, [courseData]);
 
   const updateFeePayload = (index: number, value: string) => {
     const updatedPayload = [...feePayload];
@@ -93,7 +93,7 @@ export default function EditCourseFees() {
             </div>
           ) : (
             <>
-              {feeData && (
+              {courseData && (
                 <>
                   <div className="flex gap-4 items-center mb-4">
                     <ChevronLeft
@@ -103,7 +103,7 @@ export default function EditCourseFees() {
                       className="font-bold cursor-pointer text-muted-foreground hover:text-secondary-foreground "
                     />
                     <h1 className="text-3xl font-medium">
-                      Fee Structure - {feeData[0].courses?.name}
+                      Fee Structure - {courseData.name}
                     </h1>
                   </div>
                   <Table className="max-w-md">

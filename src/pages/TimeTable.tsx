@@ -16,7 +16,13 @@ export default function WeeklyTimetable() {
     "Saturday",
   ];
   const timeSlots = ["18:00", "19:00", "20:00"];
-  const { data, error, isLoading } = useQuery({
+  type TimetableData = {
+    [slot: string]: {
+      [day: string]: { name: string }[];
+    };
+  };
+
+  const { data, error, isLoading } = useQuery<TimetableData>({
     queryKey: ["timetable"],
     queryFn: async () => {
       // Simulate fetching timetable data
@@ -24,7 +30,7 @@ export default function WeeklyTimetable() {
       if (error) {
         throw error;
       }
-      return data;
+      return data as TimetableData;
     },
   });
 

@@ -104,7 +104,16 @@ export default function EditStudentDetails() {
     //  Update details
     const { error: addressError } = await supabase
       .from("addresses")
-      .upsert(editAddressPayload as AddressUpdate);
+      .upsert({
+        id: editAddressPayload?.id || "",
+        unit: editAddressPayload?.unit || "",
+        line_1: editAddressPayload?.line_1 || "",
+        line_2: editAddressPayload?.line_2 ?? "",
+        city: editAddressPayload?.city || "",
+        state: editAddressPayload?.state || "",
+        country: editAddressPayload?.country || "",
+        zipcode: editAddressPayload?.zipcode || "",
+      });
     if (addressError) {
       toast({
         title: "Error occurred",
